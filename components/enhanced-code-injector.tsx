@@ -235,7 +235,7 @@ export default function EnhancedCodeInjector() {
         <div className="flex items-center gap-2 mt-2">
           {getEnvironmentIcon()}
           <Badge variant="outline">Environment: {environment}</Badge>
-          <Badge variant="secondary">Storage: In-Memory</Badge>
+          <Badge variant="secondary">Storage: PostgreSQL</Badge>
           <Badge variant="outline">Platform: v0.dev/Vercel</Badge>
         </div>
       </div>
@@ -385,7 +385,24 @@ export default app;`}
                         <div>Type: {module.type}</div>
                         <div>Format: {module.format}</div>
                         <div>Created: {new Date(module.createdAt).toLocaleTimeString()}</div>
-                        {module.routes?.length > 0 && <div>Routes: {module.routes.join(", ")}</div>}
+                        {module.routes?.length > 0 && (
+                          <div>
+                            Routes:{" "}
+                            {module.routes
+                              .map((route: string, idx: number) => (
+                                <a
+                                  key={idx}
+                                  href={`/api/modules/${module.id}${route.split(" ")[1]}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-500 hover:underline"
+                                >
+                                  {route.split(" ")[0]} {route.split(" ")[1]}
+                                </a>
+                              ))
+                              .reduce((prev: any, curr: any) => [prev, ", ", curr])}
+                          </div>
+                        )}
                         {module.secrets?.length > 0 && <div>Secrets: {module.secrets.length}</div>}
                       </div>
                     </div>
@@ -454,8 +471,7 @@ export default app;`}
                         ✅ Module successfully injected with ID: <code>{analysis.manifest.id}</code>
                         <br />
                         🏗️ Parsed using: <strong>{analysis.parsingStrategy}</strong> strategy
-                        <br />
-                        ☁️ Stored in: <strong>Serverless in-memory registry</strong>
+                        <br />💾 Stored in: <strong>PostgreSQL Database</strong>
                         <br />⏰ Created: <strong>{new Date(analysis.manifest.createdAt).toLocaleString()}</strong>
                         {analysis.errors.length > 0 && (
                           <>
@@ -470,8 +486,8 @@ export default app;`}
                       <Cloud className="h-4 w-4" />
                       <AlertDescription>
                         <strong>Serverless Environment Notes:</strong>
-                        <br />• Modules are stored in memory and will reset on function restart
-                        <br />• No persistent file system - all storage is temporary
+                        <br />• Modules are persisted in your PostgreSQL database
+                        <br />• Serverless functions are stateless; module execution is dynamic per request
                         <br />• Optimized for v0.dev/Vercel serverless execution
                         <br />• Environment variables are securely injected per module
                       </AlertDescription>

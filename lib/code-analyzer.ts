@@ -1,5 +1,9 @@
 import { parse } from "@babel/parser"
 import path from "path"
+import { drizzle } from "drizzle-orm/node-postgres"
+import { Pool } from "pg"
+import { modules } from "../drizzle/schema" // Adjust path if your schema file is elsewhere
+import { eq } from "drizzle-orm" // Add this import for eq
 
 export interface CodeAnalysis {
   type: "frontend" | "backend" | "fullstack" | "other"
@@ -29,8 +33,9 @@ export interface ModuleManifest {
   createdAt: string
 }
 
-// In-memory module registry for serverless environments
-const moduleRegistry = new Map<string, ModuleManifest>()
+// Initialize Drizzle client (ensure DATABASE_URL is set in environment)
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const db = drizzle(pool)
 
 // Get the appropriate storage directory for the environment
 function getStorageDir(): string {
@@ -446,59 +451,18 @@ function generateFileStructure(
   return structure
 }
 
-export async function injectModule(moduleId: string, manifest: ModuleManifest, secrets: string[]): Promise<void> {
+export async function injectModule(manifest: ModuleManifest): Promise<void> {
   try {
-    // Store in in-memory registry for serverless environments
-    moduleRegistry.set(moduleId, manifest)
-
-    // For backend modules, create a virtual handler
-    if (manifest.type === "backend" || manifest.type === "fullstack") {
-      // Create a safe execution context
-      const moduleContext = {
-        require: require,
-        module: { exports: {} },
-        exports: {},
-        console: console,
-        process: {
-          env: Object.fromEntries(secrets.filter((s) => manifest.secrets.includes(s)).map((s) => [s, process.env[s]])),
-        },
-        __dirname: "/tmp/modules/" + moduleId,
-        __filename: "/tmp/modules/" + moduleId + "/index.js",
-      }
-
-      // Execute the code in a controlled context
-      try {
-        const wrappedCode = `
-          (function(require, module, exports, console, process, __dirname, __filename) {
-            ${manifest.code}
-            return module.exports;
-          })
-        `
-
-        const moduleFunction = eval(wrappedCode)
-        const handler = moduleFunction(
-          moduleContext.require,
-          moduleContext.module,
-          moduleContext.exports,
-          moduleContext.console,
-          moduleContext.process,
-          moduleContext.__dirname,
-          moduleContext.__filename,
-        )
-
-        // Store the handler for potential use
-        moduleRegistry.set(moduleId, { ...manifest, handler })
-
-        console.log(`🔄 Successfully loaded module ${moduleId} in memory`)
-      } catch (executionError) {
-        console.error(`❌ Failed to execute module ${moduleId}:`, executionError)
-        throw executionError
-      }
-    }
-
-    console.log(`✅ Module ${moduleId} injected successfully`)
+    await db.insert(modules).values({
+      id: manifest.id,
+      code: manifest.code,
+      format: manifest.format,
+      manifest: manifest as any, // Drizzle jsonb type casting
+      createdAt: new Date(),
+    })
+    console.log(`✅ Module ${manifest.id} saved to database successfully`)
   } catch (error) {
-    console.error(`❌ Failed to inject module ${moduleId}:`, error)
+    console.error(`❌ Failed to save module ${manifest.id} to database:`, error)
     throw error
   }
 }
@@ -509,14 +473,12 @@ export function getAvailableSecrets(): string[] {
   )
 }
 
-export function getModuleRegistry(): Map<string, ModuleManifest> {
-  return moduleRegistry
+export async function getModule(moduleId: string): Promise<ModuleManifest | undefined> {
+  const result = await db.select().from(modules).where(eq(modules.id, moduleId)).limit(1)
+  return result[0] ? (result[0].manifest as ModuleManifest) : undefined
 }
 
-export function getModule(moduleId: string): ModuleManifest | undefined {
-  return moduleRegistry.get(moduleId)
-}
-
-export function getAllModules(): ModuleManifest[] {
-  return Array.from(moduleRegistry.values())
+export async function getAllModules(): Promise<ModuleManifest[]> {
+  const results = await db.select().from(modules)
+  return results.map((row) => row.manifest as ModuleManifest)
 }

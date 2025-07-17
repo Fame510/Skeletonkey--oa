@@ -80,15 +80,15 @@ Be specific and actionable for serverless deployment.`,
     const moduleId = analysis.manifest.id
 
     try {
-      await injectModule(moduleId, analysis.manifest, availableSecrets)
-      console.log(`🚀 Module ${moduleId} injected successfully in serverless environment`)
+      await injectModule(analysis.manifest)
+      console.log(`🚀 Module ${moduleId} saved to database successfully`)
     } catch (injectionError) {
-      console.error("Module injection failed:", injectionError)
+      console.error("Module database save failed:", injectionError)
       return NextResponse.json(
         {
           success: false,
-          error: `Module injection failed: ${injectionError}`,
-          details: "Check serverless execution environment",
+          error: `Module database save failed: ${injectionError}`,
+          details: "Ensure DATABASE_URL is correctly configured and database is accessible.",
         },
         { status: 500 },
       )
@@ -98,7 +98,7 @@ Be specific and actionable for serverless deployment.`,
       success: true,
       moduleId,
       environment: "serverless",
-      storage: "in-memory",
+      storage: "database",
       analysis: {
         ...analysis,
         availableSecrets,
@@ -129,20 +129,19 @@ Be specific and actionable for serverless deployment.`,
 
 export async function GET() {
   try {
-    // Return all modules from in-memory registry
-    const modules = getAllModules()
+    const modules = await getAllModules()
 
     return NextResponse.json({
       modules,
       count: modules.length,
       environment: "serverless",
-      storage: "in-memory",
-      note: "Modules are stored in memory and will reset on function restart",
+      storage: "database",
+      note: "Modules are persisted in PostgreSQL database.",
     })
   } catch (error) {
     return NextResponse.json(
       {
-        error: "Failed to list modules",
+        error: "Failed to list modules from database",
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
