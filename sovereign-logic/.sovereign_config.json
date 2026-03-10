@@ -1,0 +1,23 @@
+{
+  "supabase": {
+    "url": "https://kdqbwdvobkwkakzzowqm.supabase.co",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkcWJ3ZHZvYmt3a2Frenpvd3FtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NjA4NTYsImV4cCI6MjA4ODIzNjg1Nn0.QVYJnCsiJCqTjiOdpcL3Vxb-OmQwlf0c6ESnfTUmEUE"
+  },
+  "github": {
+    "repo": "Fame510/Skeletonkey--oa",
+    "token": "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"
+  },
+  "openrouter": {
+    "key": "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"
+  },
+  "accounts": {
+    "primary_email": "docspoc101@gmail.com",
+    "secondary_email": "oopsinc510@gmail.com",
+    "password_hint": "TBkeys"
+  },
+  "services_to_provision": [
+    "groq.com - FREE Llama 3.3 70B",
+    "simplelogin.io - Email alias creation",
+    "crewai.com - Agent orchestration"
+  ]
+}
