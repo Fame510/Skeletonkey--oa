@@ -1,12 +1,11 @@
 "use server"
 
 import { generateText } from "ai"
-import { minimax } from "vercel-minimax-ai-provider"
 
 export async function generateCodeFromDescription(description: string) {
   try {
     const { text } = await generateText({
-      model: minimax("MiniMax-M2"),
+      model: "openai/gpt-4o-mini",
       prompt: `Generate complete, production-ready code based on this description:
       
       ${description}
@@ -31,7 +30,7 @@ export async function generateCodeFromDescription(description: string) {
 export async function optimizeCode(code: string) {
   try {
     const { text } = await generateText({
-      model: minimax("MiniMax-M2"),
+      model: "openai/gpt-4o-mini",
       prompt: `Optimize this code for better performance, readability, and maintainability:
       
       ${code}
@@ -56,7 +55,7 @@ export async function optimizeCode(code: string) {
 export async function explainCode(code: string) {
   try {
     const { text } = await generateText({
-      model: minimax("MiniMax-M2"),
+      model: "openai/gpt-4o-mini",
       prompt: `Provide a detailed explanation of this code:
       
       ${code}

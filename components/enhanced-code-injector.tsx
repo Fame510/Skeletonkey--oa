@@ -630,7 +630,7 @@ export default app;`}
                       ) : (
                         <div className="text-center py-8 text-muted-foreground">
                           {enableAI
-                            ? "AI analysis not available (check MINIMAX_API_KEY)"
+                            ? "AI analysis not available (check AI_GATEWAY_API_KEY)"
                             : "Enable AI analysis to get serverless-specific insights"}
                         </div>
                       )}

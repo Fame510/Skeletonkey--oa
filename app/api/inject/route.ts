@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { analyzeCode, injectModule, getAvailableSecrets, getAllModules } from "@/lib/code-analyzer"
 import { generateText } from "ai"
-import { minimax } from "vercel-minimax-ai-provider"
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,10 +40,10 @@ export async function POST(request: NextRequest) {
 
     // AI-enhanced analysis if requested
     let aiInsights = null
-    if (enableAI && process.env.MINIMAX_API_KEY) {
+    if (enableAI && process.env.AI_GATEWAY_API_KEY) {
       try {
         const { text } = await generateText({
-          model: minimax("MiniMax-M2"),
+          model: "openai/gpt-4o-mini",
           prompt: `Analyze this ${format} code for a serverless environment:
 
 Code:
