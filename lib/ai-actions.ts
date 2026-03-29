@@ -1,12 +1,12 @@
 "use server"
 
 import { generateText } from "ai"
-import { groq } from "@ai-sdk/groq"
+import { minimax } from "vercel-minimax-ai-provider"
 
 export async function generateCodeFromDescription(description: string) {
   try {
     const { text } = await generateText({
-      model: groq("llama-3.1-70b-versatile"),
+      model: minimax("MiniMax-M2"),
       prompt: `Generate complete, production-ready code based on this description:
       
       ${description}
@@ -31,7 +31,7 @@ export async function generateCodeFromDescription(description: string) {
 export async function optimizeCode(code: string) {
   try {
     const { text } = await generateText({
-      model: groq("llama-3.1-70b-versatile"),
+      model: minimax("MiniMax-M2"),
       prompt: `Optimize this code for better performance, readability, and maintainability:
       
       ${code}
@@ -56,7 +56,7 @@ export async function optimizeCode(code: string) {
 export async function explainCode(code: string) {
   try {
     const { text } = await generateText({
-      model: groq("llama-3.1-70b-versatile"),
+      model: minimax("MiniMax-M2"),
       prompt: `Provide a detailed explanation of this code:
       
       ${code}
