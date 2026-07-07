@@ -6,10 +6,12 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
-    "@ai-sdk/groq": "latest",
     "@aws-sdk/client-rds-data": "latest",
     "@babel/parser": "latest",
     "@cloudflare/workers-types": "latest",
@@ -77,7 +79,6 @@
     "next-themes": "^0.4.4",
     "path": "latest",
     "pg": "latest",
-    "pg-native": "latest",
     "postgres": "latest",
     "react": "^19",
     "react-day-picker": "8.10.1",
@@ -91,12 +92,15 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^3.24.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.9",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.1",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"

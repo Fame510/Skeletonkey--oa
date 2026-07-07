@@ -33,8 +33,11 @@ export interface ModuleManifest {
   createdAt: string
 }
 
-// Initialize Drizzle client (ensure DATABASE_URL is set in environment)
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+// Initialize Drizzle client with Supabase PostgreSQL
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL || process.env.SUPABASE_DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+})
 const db = drizzle(pool)
 
 // Get the appropriate storage directory for the environment
